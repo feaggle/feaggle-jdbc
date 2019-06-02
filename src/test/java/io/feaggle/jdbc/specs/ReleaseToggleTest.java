@@ -1,6 +1,5 @@
 package io.feaggle.jdbc.specs;
 
-import io.feaggle.DriverLoader;
 import io.feaggle.Feaggle;
 import io.feaggle.jdbc.JdbcDriver;
 import io.feaggle.jdbc.Specification;
