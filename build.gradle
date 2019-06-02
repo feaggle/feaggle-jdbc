@@ -1,0 +1,28 @@
+plugins {
+    id 'java'
+}
+
+group 'io.feaggle'
+version '0.1.0'
+
+sourceCompatibility = 11
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+ext {
+    feaggle = '0.1.0'
+    junit = '5.4.0'
+    h2 = '1.4.199'
+    flyway = '5.2.4'
+}
+
+dependencies {
+    compile "io.feaggle:feaggle:$feaggle"
+
+    testCompile "org.flywaydb:flyway-core:$flyway"
+    testCompile "com.h2database:h2:$h2"
+    testCompile "org.junit.jupiter:junit-jupiter:$junit"
+}
