@@ -8,11 +8,13 @@ package io.feaggle.jdbc.drivers.experiment;
 import io.feaggle.jdbc.exceptions.JdbcStatusException;
 import io.feaggle.toggle.experiment.ExperimentCohort;
 import io.feaggle.toggle.experiment.ExperimentDriver;
+import io.feaggle.toggle.experiment.segment.Segment;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class JdbcExperimentDriver<T extends ExperimentCohort> implements ExperimentDriver<T>, Closeable {
@@ -50,20 +52,20 @@ public class JdbcExperimentDriver<T extends ExperimentCohort> implements Experim
     public boolean isEnabledForCohort(String experimentName, T cohort) {
         try {
             queryExperiment.setString(1, experimentName);
-            try (var experimentRs = queryExperiment.executeQuery()) {
+            try (ResultSet experimentRs = queryExperiment.executeQuery()) {
                 if (!experimentRs.next()) {
                     return false;
                 }
 
-                var isEnabled = experimentRs.getBoolean(1);
+                boolean isEnabled = experimentRs.getBoolean(1);
                 if (!isEnabled) {
                     return false;
                 }
 
                 querySegments.setString(1, experimentName);
-                try (var segmentsRs = querySegments.executeQuery()) {
+                try (ResultSet segmentsRs = querySegments.executeQuery()) {
                     while (segmentsRs.next()) {
-                        var segment = resolver.resolveResultSet(segmentsRs);
+                        Segment<T> segment = resolver.resolveResultSet(segmentsRs);
                         if (!segment.evaluate(cohort)) {
                             return false;
                         }

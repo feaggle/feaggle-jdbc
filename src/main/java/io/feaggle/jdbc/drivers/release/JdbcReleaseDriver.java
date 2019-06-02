@@ -12,6 +12,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class JdbcReleaseDriver implements ReleaseDriver, Closeable {
@@ -33,14 +34,14 @@ public class JdbcReleaseDriver implements ReleaseDriver, Closeable {
     public boolean isFlaggedForRelease(String feature) {
         try {
             statement.setString(1, feature);
-            var resultSet = statement.executeQuery();
-            if (!resultSet.next()) {
-                return false;
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return false;
+                }
+
+                return resultSet.getBoolean(1);
             }
 
-            var result = resultSet.getBoolean(1);
-            resultSet.close();
-            return result;
         } catch (SQLException e) {
             return false;
         }

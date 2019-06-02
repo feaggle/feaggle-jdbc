@@ -55,7 +55,7 @@ public class OperationalToggleTest extends Specification {
 
     @Test
     void shouldDelegateToTheProvidedOperationalDriver() throws SQLException {
-        var isEnabled = feaggle.operational(operationalName).isEnabled();
+        boolean isEnabled = feaggle.operational(operationalName).isEnabled();
         assertTrue(isEnabled);
     }
 }

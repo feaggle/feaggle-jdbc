@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public abstract class Specification {
@@ -32,7 +33,7 @@ public abstract class Specification {
     }
 
     protected final void withRelease(String name, boolean status) throws SQLException {
-        var statement = connection.prepareStatement("INSERT INTO RELEASES(ID, STATUS) VALUES(?, ?)");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO RELEASES(ID, STATUS) VALUES(?, ?)");
         statement.setString(1, name);
         statement.setBoolean(2, status);
 
@@ -40,7 +41,7 @@ public abstract class Specification {
     }
 
     protected final void withExperiment(String name, boolean status) throws SQLException {
-        var statement = connection.prepareStatement("INSERT INTO EXPERIMENTS(ID, STATUS) VALUES(?, ?)");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO EXPERIMENTS(ID, STATUS) VALUES(?, ?)");
         statement.setString(1, name);
         statement.setBoolean(2, status);
 
@@ -48,7 +49,7 @@ public abstract class Specification {
     }
 
     protected final void rollout(String name, int percentage) throws SQLException {
-        var statement = connection.prepareStatement("INSERT INTO SEGMENTS(ID, KIND, ROLLOUT, PREMIUM) VALUES(?, ?, ?, ?)");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO SEGMENTS(ID, KIND, ROLLOUT, PREMIUM) VALUES(?, ?, ?, ?)");
         statement.setString(1, name);
         statement.setString(2, "ROLLOUT");
         statement.setInt(3, percentage);
@@ -58,7 +59,7 @@ public abstract class Specification {
     }
 
     protected final void beingPremium(String name, boolean premium) throws SQLException {
-        var statement = connection.prepareStatement("INSERT INTO SEGMENTS(ID, KIND, ROLLOUT, PREMIUM) VALUES(?, ?, ?, ?)");
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO SEGMENTS(ID, KIND, ROLLOUT, PREMIUM) VALUES(?, ?, ?, ?)");
         statement.setString(1, name);
         statement.setString(2, "PREMIUM");
         statement.setObject(3, null);

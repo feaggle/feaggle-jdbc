@@ -58,7 +58,7 @@ public class ExperimentToggleTest extends Specification implements SegmentResolv
         rollout(experimentName, 100);
         beingPremium(experimentName, true);
 
-        var isEnabled = feaggle.experiment(experimentName).isEnabledFor(new PremiumCohort(true));
+        boolean isEnabled = feaggle.experiment(experimentName).isEnabledFor(new PremiumCohort(true));
         assertTrue(isEnabled);
     }
 
@@ -68,7 +68,7 @@ public class ExperimentToggleTest extends Specification implements SegmentResolv
         rollout(experimentName, 0);
         beingPremium(experimentName, true);
 
-        var isEnabled = feaggle.experiment(experimentName).isEnabledFor(new PremiumCohort(true));
+        boolean isEnabled = feaggle.experiment(experimentName).isEnabledFor(new PremiumCohort(true));
         assertFalse(isEnabled);
     }
 
@@ -78,7 +78,7 @@ public class ExperimentToggleTest extends Specification implements SegmentResolv
         rollout(experimentName, 100);
         beingPremium(experimentName, true);
 
-        var isEnabled = feaggle.experiment(experimentName).isEnabledFor(new PremiumCohort(true));
+        boolean isEnabled = feaggle.experiment(experimentName).isEnabledFor(new PremiumCohort(true));
         assertFalse(isEnabled);
     }
 
@@ -88,7 +88,7 @@ public class ExperimentToggleTest extends Specification implements SegmentResolv
         rollout(experimentName, 100);
         beingPremium(experimentName, true);
 
-        var isEnabled = feaggle.experiment(experimentName).isEnabledFor(new PremiumCohort(false));
+        boolean isEnabled = feaggle.experiment(experimentName).isEnabledFor(new PremiumCohort(false));
         assertFalse(isEnabled);
     }
 
