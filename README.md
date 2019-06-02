@@ -313,6 +313,6 @@ public class MySegmentResolver implements SegmentResolver<PremiumCohort> {
 
 ```java
 driverLoader = JdbcDriver.<PremiumCohort>from(connection())
-    .defaults("KIND, ROLLOUT, PREMIUM", this)
+    .defaults("KIND, ROLLOUT, PREMIUM", new MySegmentResolver())
     .build();
 ```
