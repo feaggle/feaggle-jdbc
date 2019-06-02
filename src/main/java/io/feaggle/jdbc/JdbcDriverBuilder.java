@@ -30,6 +30,11 @@ public class JdbcDriverBuilder<T extends ExperimentCohort> {
         return this;
     }
 
+    public JdbcDriverBuilder<T> defaults() {
+        this.releaseQueryDefinition = "SELECT STATUS FROM RELEASES WHERE ID = ?";
+        return this;
+    }
+
     public JdbcDriverBuilder<T> defaults(String fields, SegmentResolver<T> segmentResolver) {
         this.releaseQueryDefinition = "SELECT STATUS FROM RELEASES WHERE ID = ?";
         this.experimentQueryDefinition = "SELECT STATUS FROM EXPERIMENTS WHERE ID = ?";

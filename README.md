@@ -37,6 +37,33 @@ Feaggle feaggle = Feaggle.load(driver); // Use feaggle as always
 
 Depending on which features you want to use on feaggle-jdbc, you will need to set up one or more drivers.
 
+## Simple configuration
+
+If you don't have any database set up and you only need release toggles, you can use the default configuration provided
+by the JdbcDriver. You will need to run this SQL migration into the database:
+
+```sql
+CREATE TABLE RELEASES(
+    ID VARCHAR(256) PRIMARY KEY,
+    STATUS BIT
+);
+```
+
+And create the feaggle configuration as in:
+
+```java
+Feaggle feaggle = Feaggle.load(
+    JdbcDriver.from(yourJdbcConnection)
+        .defaults()
+        .build()
+);
+```
+
+And feaggle will be ready for work. If you need more advanced configuration and features (like experiments and operational toggles)
+continue reading:
+
+## Advanced configuration
+
 ### Releases
 
 Releases can be stored in any way in your database, the only requirement that feaggle-jdbc has is a SELECT query
@@ -219,5 +246,55 @@ JdbcDriver.<PremiumCohort>from(connection())
                     .build()
             ).build()
     ).build();
+```
 
+## Set Up From Scratch
+
+If you want to use feaggle-jdbc and you don't have any database configuration yet, you can use some sensitive defaults so
+it's easier to set up everything. With the defaults, you can build your database with the following schema:
+
+```sql
+CREATE TABLE RELEASES(
+    ID VARCHAR(256) PRIMARY KEY,
+    STATUS BIT
+);
+
+CREATE TABLE EXPERIMENTS(
+    ID VARCHAR(256) PRIMARY KEY,
+    STATUS BIT
+);
+
+CREATE TABLE SEGMENTS(
+    ID VARCHAR(256),
+    KIND VARCHAR(256) NOT NULL,
+    ROLLOUT INT,
+    PREMIUM BIT -- you can add or remove fields here. Just keep ID, KIND and ROLLOUT
+);
+
+CREATE INDEX SEGMENTS_BY_EXPERIMENT ON SEGMENTS (ID);
+```
+
+You can optimize it further for your needs.
+
+Then you will only need to build your own SegmentResolver (as explained above) and choose the needed fields from the table:
+
+```java
+public class MySegmentResolver implements SegmentResolver<PremiumCohort> {
+    @Override
+        public Segment<PremiumCohort> resolveResultSet(ResultSet resultSet) throws SQLException {
+            String kind = resultSet.getString(1);
+            switch (kind) {
+                case "ROLLOUT": return Rollout.<PremiumCohort>builder().percentage(resultSet.getInt(2)).build();
+                case "PREMIUM": return new PremiumSegment(resultSet.getBoolean(3));
+            }
+    
+            return null;
+        }
+}
+```
+
+```java
+driverLoader = JdbcDriver.<PremiumCohort>from(connection())
+    .defaults("KIND, ROLLOUT, PREMIUM", this)
+    .build();
 ```
