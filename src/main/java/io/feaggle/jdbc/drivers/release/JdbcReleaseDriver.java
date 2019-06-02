@@ -18,7 +18,8 @@ public class JdbcReleaseDriver implements ReleaseDriver, Closeable {
         } catch (SQLException e) {
             throw new JdbcStatusException(
                     "Could not create prepared statement for querying releases. " +
-                            "Please make sure that the provided query is valid.",
+                            "Please make sure that the provided query is valid." +
+                            "\nQuery: " + releaseQueryDefinition,
                     e);
         }
     }

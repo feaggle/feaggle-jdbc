@@ -34,6 +34,34 @@ public abstract class Specification {
         statement.executeUpdate();
     }
 
+    protected final void withExperiment(String name, boolean status) throws SQLException {
+        var statement = connection.prepareStatement("INSERT INTO EXPERIMENTS(ID, STATUS) VALUES(?, ?)");
+        statement.setString(1, name);
+        statement.setBoolean(2, status);
+
+        statement.executeUpdate();
+    }
+
+    protected final void rollout(String name, int percentage) throws SQLException {
+        var statement = connection.prepareStatement("INSERT INTO SEGMENTS(ID, KIND, ROLLOUT, PREMIUM) VALUES(?, ?, ?, ?)");
+        statement.setString(1, name);
+        statement.setString(2, "ROLLOUT");
+        statement.setInt(3, percentage);
+        statement.setObject(4, null);
+
+        statement.executeUpdate();
+    }
+
+    protected final void beingPremium(String name, boolean premium) throws SQLException {
+        var statement = connection.prepareStatement("INSERT INTO SEGMENTS(ID, KIND, ROLLOUT, PREMIUM) VALUES(?, ?, ?, ?)");
+        statement.setString(1, name);
+        statement.setString(2, "PREMIUM");
+        statement.setObject(3, null);
+        statement.setBoolean(4, premium);
+
+        statement.executeUpdate();
+    }
+
     protected final Connection connection() {
         return connection;
     }
