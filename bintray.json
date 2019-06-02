@@ -18,14 +18,14 @@
   "files": [
     {
       "includePattern": "build/libs/(.*).jar",
-      "uploadPattern": "/io/feaggle/feaggle-jdbc/1.0.1/$1.jar",
+      "uploadPattern": "/io/feaggle/feaggle-jdbc/1.0.2/$1.jar",
       "matrixParams": {
         "override": 1
       }
     },
     {
       "includePattern": "build/poms/pom-default.xml",
-      "uploadPattern": "/io/feaggle/feaggle-jdbc/1.0.1/feaggle-jdbc-1.0.1.pom",
+      "uploadPattern": "/io/feaggle/feaggle-jdbc/1.0.2/feaggle-jdbc-1.0.2.pom",
       "matrixParams": {
         "override": 1
       }

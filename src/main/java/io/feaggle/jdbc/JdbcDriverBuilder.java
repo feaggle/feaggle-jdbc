@@ -6,10 +6,13 @@
 package io.feaggle.jdbc;
 
 import io.feaggle.jdbc.drivers.experiment.SegmentDefinition;
+import io.feaggle.jdbc.drivers.experiment.SegmentResolver;
 import io.feaggle.toggle.experiment.ExperimentCohort;
 import io.feaggle.toggle.operational.OperationalDriver;
 
 import java.sql.Connection;
+
+import static io.feaggle.jdbc.drivers.experiment.SegmentDefinition.withSegments;
 
 public class JdbcDriverBuilder<T extends ExperimentCohort> {
     private final Connection connection;
@@ -24,6 +27,14 @@ public class JdbcDriverBuilder<T extends ExperimentCohort> {
 
     public JdbcDriverBuilder<T> releasesAre(String queryDefinition) {
         this.releaseQueryDefinition = queryDefinition;
+        return this;
+    }
+
+    public JdbcDriverBuilder<T> defaults(String fields, SegmentResolver<T> segmentResolver) {
+        this.releaseQueryDefinition = "SELECT STATUS FROM RELEASES WHERE ID = ?";
+        this.experimentQueryDefinition = "SELECT STATUS FROM EXPERIMENTS WHERE ID = ?";
+        this.segmentDefinition = withSegments("SELECT " + fields + " FROM SEGMENTS WHERE ID = ?", segmentResolver);
+
         return this;
     }
 
