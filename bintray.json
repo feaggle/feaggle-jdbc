@@ -1,7 +1,7 @@
 {
   "package": {
     "name": "feaggle-jdbc",
-    "repo": "feaggle-jdbc",
+    "repo": "feaggle",
     "subject": "kmruiz",
     "desc": "Feature toggle for the JVM, loaded using JDBC drivers.",
     "website_url": "https://github.com/feaggle/feaggle-jdbc",
