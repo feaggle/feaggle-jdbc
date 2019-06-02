@@ -21,19 +21,22 @@ import java.sql.Connection;
 public class JdbcDriver<T extends ExperimentCohort> implements DriverLoader<T>, Closeable {
     private final JdbcReleaseDriver releaseDriver;
     private final JdbcExperimentDriver<T> experimentDriver;
+    private final OperationalDriver operationalDriver;
 
-    JdbcDriver(Connection connection, String releaseQueryDefinition, String experimentQueryDefinition, SegmentDefinition<T> segments) {
+    JdbcDriver(Connection connection, String releaseQueryDefinition, String experimentQueryDefinition, SegmentDefinition<T> segments, OperationalDriver operationalDriver) {
         if (releaseQueryDefinition != null) {
-            releaseDriver = new JdbcReleaseDriver(connection, releaseQueryDefinition);
+            this.releaseDriver = new JdbcReleaseDriver(connection, releaseQueryDefinition);
         } else {
-            releaseDriver = null;
+            this.releaseDriver = null;
         }
 
         if (!(experimentQueryDefinition == null || segments == null)) {
-            experimentDriver = new JdbcExperimentDriver<>(connection, experimentQueryDefinition, segments);
+            this.experimentDriver = new JdbcExperimentDriver<>(connection, experimentQueryDefinition, segments);
         } else {
-            experimentDriver = null;
+            this.experimentDriver = null;
         }
+
+        this.operationalDriver = operationalDriver;
     }
 
     public static <T extends ExperimentCohort> JdbcDriverBuilder<T> from(Connection connection) {
@@ -47,7 +50,7 @@ public class JdbcDriver<T extends ExperimentCohort> implements DriverLoader<T>, 
 
     @Override
     public OperationalDriver loadOperationalDriver() {
-        return null;
+        return operationalDriver;
     }
 
     @Override

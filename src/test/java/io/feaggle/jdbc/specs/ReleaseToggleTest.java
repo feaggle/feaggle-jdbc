@@ -27,7 +27,7 @@ public class ReleaseToggleTest extends Specification {
 
     @BeforeEach
     public void setUp() {
-        driverLoader = JdbcDriver.from(connection())
+        driverLoader = JdbcDriver.<NoopCohort>from(connection())
                             .releasesAre(
                                     "SELECT STATUS FROM RELEASES WHERE ID = ?"
                             ).build();

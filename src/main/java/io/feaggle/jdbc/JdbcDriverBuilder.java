@@ -7,6 +7,7 @@ package io.feaggle.jdbc;
 
 import io.feaggle.jdbc.drivers.experiment.SegmentDefinition;
 import io.feaggle.toggle.experiment.ExperimentCohort;
+import io.feaggle.toggle.operational.OperationalDriver;
 
 import java.sql.Connection;
 
@@ -15,23 +16,29 @@ public class JdbcDriverBuilder<T extends ExperimentCohort> {
     private String releaseQueryDefinition;
     private String experimentQueryDefinition;
     private SegmentDefinition<T> segmentDefinition;
+    private OperationalDriver operationalDriver;
 
     JdbcDriverBuilder(Connection connection) {
         this.connection = connection;
     }
 
-    public JdbcDriverBuilder releasesAre(String queryDefinition) {
+    public JdbcDriverBuilder<T> releasesAre(String queryDefinition) {
         this.releaseQueryDefinition = queryDefinition;
         return this;
     }
 
-    public JdbcDriverBuilder experimentsAre(String queryDefinition, SegmentDefinition<T> segments) {
+    public JdbcDriverBuilder<T> experimentsAre(String queryDefinition, SegmentDefinition<T> segments) {
         this.experimentQueryDefinition = queryDefinition;
         this.segmentDefinition = segments;
         return this;
     }
 
+    public JdbcDriverBuilder<T> operationalTogglesAre(OperationalDriver driver) {
+        this.operationalDriver = driver;
+        return this;
+    }
+
     public JdbcDriver<T> build() {
-        return new JdbcDriver<>(connection, releaseQueryDefinition, experimentQueryDefinition, segmentDefinition);
+        return new JdbcDriver<>(connection, releaseQueryDefinition, experimentQueryDefinition, segmentDefinition, operationalDriver);
     }
 }
