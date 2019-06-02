@@ -22,6 +22,24 @@ the [webpage](https://www.feaggle.org/).
 This document only explains how to configure feaggle with the jdbc backend, about the actual usage please go to the
 [main repository page](https://github.com/feaggle/feaggle) or to the [webpage](https://www.feaggle.org/).
 
+## Gradle Dependency
+
+You will need to use jcenter as a repository:
+
+```groovy
+repositories {
+    //... 
+    jcenter()
+    //...
+}
+```
+
+And the dependency:
+
+```groovy
+compile "io.feaggle:feaggle-jdbc:1.0.3"
+```
+
 ## How To Configure
 
 feaggle-jdbc requires a jdbc connection to get the information from your jdbc store. There is a builder that will let
