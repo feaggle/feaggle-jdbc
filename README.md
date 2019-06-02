@@ -68,6 +68,13 @@ SELECT STATUS FROM EXPERIMENTS WHERE ID = ?
 
 #### Segmentation
 
+Segment information needs to be in a separate table with a 1 to N relationship with your experiments table. You will
+need to write a query that gets the information of the segments based on the experiment id, like in:
+
+```sql
+SELECT KIND, ROLLOUT, PREMIUM FROM SEGMENTS WHERE ID = ?
+```
+
 Segmentation requires three steps:
 
 ##### Cohorts
@@ -119,4 +126,98 @@ public class PremiumSegment implements Segment<PremiumCohort> {
 }
 ```
 
+feaggle-jdbc will need also a way to map your information in the database to segments, and the way it nows is by a custom
+`SegmentResolver<ExperimentCohort>`. A SegmentResolver will receive a ResultSet with a single row returned by the provided
+segmentation SQL query. An example implementation would be:
 
+```java
+public class MySegmentResolver implements SegmentResolver<PremiumCohort> {
+    @Override
+        public Segment<PremiumCohort> resolveResultSet(ResultSet resultSet) throws SQLException {
+            String kind = resultSet.getString(1);
+            switch (kind) {
+                case "ROLLOUT": return Rollout.<PremiumCohort>builder().percentage(resultSet.getInt(2)).build();
+                case "PREMIUM": return new PremiumSegment(resultSet.getBoolean(3));
+            }
+    
+            return null;
+        }
+}
+```
+
+For example, if the query returns the following information:
+
+| KIND    | ROLLOUT | PREMIUM |
+|---------|---------|---------|
+| ROLLOUT | 50      |         |
+| PREMIUM |         | 1       |
+
+It will return the following segments:
+
+* Rollout(50 percent of the traffic)
+* Premium(only premiums are allowed)
+
+##### Set Up
+
+Now that everything is ready, you can set up your driver to use experiments:
+
+```java
+JdbcDriver.<PremiumCohort>from(connection())
+        .experimentsAre(
+                "SELECT STATUS FROM EXPERIMENTS WHERE ID = ?",
+                withSegments(
+                        "SELECT KIND, ROLLOUT, PREMIUM FROM SEGMENTS WHERE ID = ?",
+                        new MySegmentResolver()
+                )
+        ).build();
+```
+
+You can see a running example in [the ExperimentToggleTest](src/test/java/io/feaggle/jdbc/specs/ExperimentToggleTest.java)
+and you can check which migrations are ran in the database [here](src/test/resources/db/migration/V1__Schema.sql).
+
+### Operational Toggles
+
+Operational toggles are not supported yet, so they need to be passed in memory using the BasicOperationalDriver.
+
+```java
+JdbcDriver.from(connection())
+    .operationalTogglesAre(
+            BasicOperationalDriver.builder()
+                .rule(Rule.builder()
+                        .toggle(operationalName)
+                        .enabled(true)
+                        .sensor(
+                                Cpu.builder().predicate(Cpu.usageIsGreaterThan(0)).build()
+                        )
+                        .build()
+                ).build()
+    ).build();
+```
+
+## Composition of drivers
+
+You can compose all your drivers in one driver loader, so you can load experiments and releases from the same connection:
+
+```java
+JdbcDriver.<PremiumCohort>from(connection())
+    .releasesAre("SELECT STATUS FROM RELEASES WHERE ID = ?")
+    .experimentsAre(
+            "SELECT STATUS FROM EXPERIMENTS WHERE ID = ?",
+            withSegments(
+                    "SELECT KIND, ROLLOUT, PREMIUM FROM SEGMENTS WHERE ID = ?",
+                    new MySegmentResolver()
+            )
+    )
+    .operationalTogglesAre(
+        BasicOperationalDriver.builder()
+            .rule(Rule.builder()
+                    .toggle(operationalName)
+                    .enabled(true)
+                    .sensor(
+                            Cpu.builder().predicate(Cpu.usageIsGreaterThan(0)).build()
+                    )
+                    .build()
+            ).build()
+    ).build();
+
+```
