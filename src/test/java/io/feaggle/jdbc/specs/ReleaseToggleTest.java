@@ -8,7 +8,7 @@ package io.feaggle.jdbc.specs;
 import io.feaggle.Feaggle;
 import io.feaggle.jdbc.JdbcDriver;
 import io.feaggle.jdbc.Specification;
-import io.feaggle.jdbc.cohorts.NoopCohort;
+import io.feaggle.toggle.experiment.ExperimentCohort;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,13 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReleaseToggleTest extends Specification {
-    private JdbcDriver<NoopCohort> driverLoader;
-    private Feaggle<NoopCohort> feaggle;
+    private JdbcDriver<ExperimentCohort> driverLoader;
+    private Feaggle<ExperimentCohort> feaggle;
     private String releaseName;
 
     @BeforeEach
     public void setUp() {
-        driverLoader = JdbcDriver.<NoopCohort>from(connection())
+        driverLoader = JdbcDriver.from(connection())
                             .releasesAre(
                                     "SELECT STATUS FROM RELEASES WHERE ID = ?"
                             ).build();

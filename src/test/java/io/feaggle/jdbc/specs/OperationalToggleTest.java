@@ -8,7 +8,7 @@ package io.feaggle.jdbc.specs;
 import io.feaggle.Feaggle;
 import io.feaggle.jdbc.JdbcDriver;
 import io.feaggle.jdbc.Specification;
-import io.feaggle.jdbc.cohorts.NoopCohort;
+import io.feaggle.toggle.experiment.ExperimentCohort;
 import io.feaggle.toggle.operational.BasicOperationalDriver;
 import io.feaggle.toggle.operational.Rule;
 import io.feaggle.toggle.operational.sensor.Cpu;
@@ -23,15 +23,15 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OperationalToggleTest extends Specification {
-    private JdbcDriver<NoopCohort> driverLoader;
-    private Feaggle<NoopCohort> feaggle;
+    private JdbcDriver<ExperimentCohort> driverLoader;
+    private Feaggle<ExperimentCohort> feaggle;
     private String operationalName;
 
     @BeforeEach
     public void setUp() {
         operationalName = UUID.randomUUID().toString();
 
-        driverLoader = JdbcDriver.<NoopCohort>from(connection())
+        driverLoader = JdbcDriver.from(connection())
                 .operationalTogglesAre(
                         BasicOperationalDriver.builder()
                             .rule(Rule.builder()
