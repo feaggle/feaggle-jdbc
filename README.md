@@ -37,7 +37,7 @@ repositories {
 And the dependency:
 
 ```groovy
-compile "io.feaggle:feaggle-jdbc:1.0.3"
+compile "io.feaggle:feaggle-jdbc:2.0.0"
 ```
 
 ## How To Configure
