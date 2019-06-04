@@ -6,6 +6,7 @@ import io.feaggle.jdbc.Specification;
 import io.feaggle.jdbc.cohorts.PremiumCohort;
 import io.feaggle.jdbc.cohorts.segments.PremiumSegment;
 import io.feaggle.jdbc.drivers.experiment.SegmentResolver;
+import io.feaggle.jdbc.exceptions.JdbcStatusException;
 import io.feaggle.toggle.experiment.segment.Rollout;
 import io.feaggle.toggle.experiment.segment.Segment;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,8 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DefaultConfigurationToggleTest extends Specification implements SegmentResolver<PremiumCohort> {
     private JdbcDriver<PremiumCohort> driverLoader;
@@ -31,6 +31,17 @@ public class DefaultConfigurationToggleTest extends Specification implements Seg
 
         toggleName = UUID.randomUUID().toString();
         feaggle = Feaggle.load(driverLoader);
+    }
+
+    @Test
+    void shouldFailIfTheConnectionCanNotBeEstablished() throws SQLException {
+        connection().close();
+
+        assertThrows(JdbcStatusException.class, () -> {
+            driverLoader = JdbcDriver.<PremiumCohort>from(connection())
+                .defaults("KIND, ROLLOUT, PREMIUM", this)
+                .build();
+        });
     }
 
     @Test
