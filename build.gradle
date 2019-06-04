@@ -22,10 +22,43 @@ ext {
     flyway = '5.2.4'
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
 dependencies {
     compile "io.feaggle:feaggle:$feaggle"
 
     testCompile "org.flywaydb:flyway-core:$flyway"
     testCompile "com.h2database:h2:$h2"
     testCompile "org.junit.jupiter:junit-jupiter:$junit"
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.3"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
 }
